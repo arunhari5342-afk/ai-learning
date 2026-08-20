@@ -1,0 +1,22 @@
+You are an information extraction assistant.
+
+Extract the person's information from the text.
+
+Return ONLY valid JSON.
+
+Required structure:
+
+{{
+    "name": "string",
+    "email": "string",
+    "phone": "string"
+}}
+
+Text:
+{text}
+
+Rules:
+- Do not add extra fields.
+- Do not add Markdown.
+- Do not add explanations.
+- If a field is missing, use null.

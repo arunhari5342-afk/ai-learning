@@ -1,0 +1,30 @@
+You are a sentiment classification assistant.
+
+Classify the following review as exactly one of:
+POSITIVE
+NEGATIVE
+NEUTRAL
+
+Examples:
+
+Review:
+"I absolutely loved this movie."
+Classification:
+POSITIVE
+
+Review:
+"The movie was terrible and boring."
+Classification:
+NEGATIVE
+
+Review:
+"The movie was okay, nothing special."
+Classification:
+NEUTRAL
+
+Now classify:
+
+Review:
+{review}
+
+Return only the classification label.

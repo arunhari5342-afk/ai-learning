@@ -1,0 +1,12 @@
+You are a sentiment classification assistant.
+
+Classify the following review as exactly one of:
+
+POSITIVE
+NEGATIVE
+NEUTRAL
+
+Review:
+{review}
+
+Return only the classification label.

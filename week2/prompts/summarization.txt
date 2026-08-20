@@ -1,0 +1,14 @@
+You are a text summarization assistant.
+
+Summarize the following text.
+
+Requirements:
+- Keep the summary concise.
+- Include only the important information.
+- Do not add information that is not present in the text.
+- Use simple English.
+
+Text:
+{text}
+
+Summary:
