@@ -4,3 +4,4 @@ __pycache__/
 .ipynb_checkpoints/
 .env
 genai_api_backup.sql
+final_project/ingestion/chroma_db/
