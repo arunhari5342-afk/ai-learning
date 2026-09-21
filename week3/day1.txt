@@ -1,0 +1,418 @@
+# Agentic AI — Self-Exploration
+
+## 1. Autonomy Spectrum: Chatbot → Copilot → Agent → Multi-Agent
+
+The autonomy spectrum describes how much responsibility an AI system has for understanding a task, making decisions, using tools, and completing work. The four stages can be viewed as a progression from systems that mainly respond to users toward systems that can independently coordinate complex tasks.
+
+### Chatbot
+
+A **chatbot** has the lowest level of autonomy. It receives a user's question or instruction and generates a response. The user normally decides what to ask next and controls the overall process.
+
+For example, a user might ask:
+
+> "Explain what Retrieval-Augmented Generation is."
+
+The chatbot generates an explanation, but it does not independently decide to search documents, call an API, or perform additional steps unless those capabilities have specifically been built into the application.
+
+**Typical characteristics:**
+
+* User-driven interaction
+* Mostly request-and-response
+* Limited decision-making
+* Usually no autonomous planning
+* Simple to develop and test
+
+Chatbots are useful for question answering, explanations, tutoring, brainstorming, and basic customer support.
+
+### Copilot
+
+A **copilot** provides assistance while the human remains actively involved in the task. It can understand context, make suggestions, generate content, use tools, or automate individual steps, but the human generally reviews or controls the final action.
+
+For example, a coding copilot can inspect a function and suggest a fix. The developer decides whether the suggested change should actually be applied.
+
+The key difference from a chatbot is that a copilot is usually embedded into a larger workflow and helps the user perform a task rather than simply answering questions.
+
+**Typical characteristics:**
+
+* Human remains in control
+* Provides suggestions or actions
+* Can use application context and tools
+* Supports human decision-making
+* Partial automation
+
+### Agent
+
+An **agent** is given a goal and can determine how to achieve that goal. Instead of following only a fixed sequence, it can reason about the current situation, select tools, observe their results, and decide what to do next.
+
+A typical agent loop is:
+
+```text
+Goal
+  ↓
+Perceive
+  ↓
+Reason / Plan
+  ↓
+Choose Action
+  ↓
+Use Tool
+  ↓
+Observe Result
+  ↓
+Reason Again
+  ↓
+Complete Goal
+```
+
+For example:
+
+> "Investigate why our API was failing yesterday."
+
+An agent might inspect logs, query monitoring information, check recent deployments, compare error patterns, and then produce a conclusion. The exact sequence may depend on what it discovers.
+
+Agents therefore have greater flexibility than chatbots and copilots, but they also introduce additional complexity, cost, latency, and failure possibilities.
+
+### Multi-Agent
+
+A **multi-agent system** uses multiple agents that specialize in different responsibilities.
+
+For example:
+
+```text
+                  User Goal
+                      |
+                 Coordinator
+                /     |      \
+               /      |       \
+        Research    Analysis   Review
+          Agent       Agent     Agent
+               \       |       /
+                \      |      /
+                 Final Result
+```
+
+A research agent could gather information, an analysis agent could process it, and a review agent could check the result.
+
+Multi-agent systems can be useful when a problem naturally divides into independent or specialized responsibilities. However, they also introduce communication, coordination, debugging, latency, and cost overhead.
+
+### Autonomy Progression
+
+| System      | Main Responsibility           | Autonomy    |
+| ----------- | ----------------------------- | ----------- |
+| Chatbot     | Answer the user               | Low         |
+| Copilot     | Assist the user               | Low–Medium  |
+| Agent       | Complete a goal               | Medium–High |
+| Multi-Agent | Coordinate specialized agents | High        |
+
+The important lesson is that **higher autonomy is not automatically better**. The appropriate level depends on the problem. A simple question does not require an agent, while a complex investigation may benefit from one.
+
+---
+
+# 2. Workflow vs Agent Decision Framework
+
+One of the most important decisions when designing an AI application is deciding whether to use a **fixed workflow** or an **agent**.
+
+A workflow follows a predefined sequence of steps. An agent can dynamically decide which steps to perform and which tools to use.
+
+### Workflow
+
+A workflow is appropriate when the process is **known in advance**.
+
+For example, a document-processing application might always follow:
+
+```text
+Upload Document
+      ↓
+Extract Text
+      ↓
+Classify Document
+      ↓
+Validate Data
+      ↓
+Store Result
+```
+
+The application knows what should happen at each stage.
+
+Workflows are generally:
+
+* Predictable
+* Easier to test
+* Easier to monitor
+* Easier to debug
+* Easier to control
+* Easier to estimate for cost and latency
+
+They are particularly useful for business processes where the rules and sequence are well defined.
+
+### Agent
+
+An agent becomes useful when the **next step depends on information discovered during execution**.
+
+For example:
+
+> "Find the root cause of this production problem."
+
+The system may initially inspect logs. Based on those logs, it may decide to check a database. After seeing the database result, it may decide to inspect a deployment or API response.
+
+The path is therefore not completely predetermined.
+
+An agent is more appropriate when:
+
+* The task is open-ended
+* Multiple tools may be needed
+* The next action depends on previous results
+* The system needs dynamic planning
+* The number or order of steps cannot be fixed beforehand
+
+### Decision Questions
+
+A useful framework is to ask:
+
+**1. Are the rules deterministic?**
+
+If yes, normal code is often sufficient.
+
+**2. Are the steps known beforehand?**
+
+If yes, a workflow is usually appropriate.
+
+**3. Does the task require an LLM but still follow a predictable sequence?**
+
+Use an LLM inside a workflow rather than automatically turning the whole system into an agent.
+
+**4. Does the system need to dynamically choose tools or actions?**
+
+If yes, an agent may be appropriate.
+
+**5. Is the task high-risk or expensive?**
+
+If yes, greater autonomy should be approached carefully with validation, permissions, monitoring, and human approval where appropriate.
+
+### Workflow vs Agent
+
+| Factor          | Workflow           | Agent                    |
+| --------------- | ------------------ | ------------------------ |
+| Steps           | Predetermined      | Dynamic                  |
+| Decision-making | Mostly predefined  | Dynamic                  |
+| Tool selection  | Usually predefined | Can be selected by agent |
+| Predictability  | High               | Lower                    |
+| Debugging       | Easier             | More difficult           |
+| Cost control    | Easier             | Less predictable         |
+| Latency         | More predictable   | Can vary                 |
+| Flexibility     | Lower              | Higher                   |
+| Best suited for | Known processes    | Open-ended tasks         |
+
+### Decision Principle
+
+The correct question is not:
+
+> "Can I build this as an agent?"
+
+Instead, ask:
+
+> **"Does this task actually require autonomous decision-making?"**
+
+If the answer is no, a workflow is generally simpler and easier to control. Agents should be introduced when dynamic decision-making provides a meaningful benefit.
+
+---
+
+# 3. Agent Scorecard
+
+The following six scenarios are evaluated according to how deterministic the task is, whether the steps are predictable, whether dynamic decisions are required, and whether an LLM or tools provide meaningful value.
+
+| Scenario            | Classification | Reason                                                                        |
+| ------------------- | -------------- | ----------------------------------------------------------------------------- |
+| Payroll calculation | **Plain Code** | Mathematical and business rules are deterministic                             |
+| Refund triage       | **Workflow**   | Classification and business rules can follow a fixed process                  |
+| Code review         | **Agent**      | Complex reviews may require dynamic investigation across files and tools      |
+| Daily report        | **Workflow**   | Data collection and report generation follow predictable steps                |
+| Medical advice      | **Workflow**   | High-risk task requires controlled retrieval, validation, and human oversight |
+| Log summariser      | **Workflow**   | Logs can be processed and summarized through a predictable pipeline           |
+
+### Payroll Calculation — Plain Code
+
+Payroll calculation is primarily deterministic. Salary, allowances, deductions, taxes, and other predefined rules can be implemented directly in code.
+
+For example:
+
+```text
+Salary
++ Allowances
+- Deductions
+- Taxes
+= Net Pay
+```
+
+There is little benefit in giving an agent control over this calculation. Normal code provides predictable results, fast execution, easy testing, and strong auditability.
+
+**Classification: Plain Code**
+
+**Reason:** The rules are known and the calculations are deterministic.
+
+---
+
+### Refund Triage — Workflow
+
+Refund requests often arrive as natural-language messages, so an LLM can help understand the customer's request. However, the actual decision can follow a known business process.
+
+Example:
+
+```text
+Customer Request
+      ↓
+Identify Refund Reason
+      ↓
+Find Order
+      ↓
+Check Refund Policy
+      ↓
+Check Eligibility
+      ↓
+Generate Response
+```
+
+The sequence is predictable, even though one step may use an LLM for language understanding.
+
+**Classification: Workflow**
+
+**Reason:** AI can be used for classification, while business rules remain deterministic and the overall process is known.
+
+---
+
+### Code Review — Agent
+
+Code review can be more dynamic than a simple fixed pipeline, particularly for large repositories.
+
+An advanced code-review system may need to:
+
+* Inspect multiple files
+* Follow imports and dependencies
+* Search for related implementations
+* Run tests
+* Inspect configuration
+* Investigate security issues
+* Re-check code after discovering a problem
+
+The exact investigation path may depend on what the system discovers.
+
+**Classification: Agent**
+
+**Reason:** Complex code-review tasks can require dynamic investigation, tool selection, and iterative reasoning.
+
+A simple code-review pipeline could still be implemented as a workflow, but when the system must independently investigate a repository, an agent architecture becomes more appropriate.
+
+---
+
+### Daily Report — Workflow
+
+A daily report normally follows a predictable process:
+
+```text
+Collect Data
+    ↓
+Process Data
+    ↓
+Calculate Metrics
+    ↓
+Generate Summary
+    ↓
+Format Report
+    ↓
+Save / Send
+```
+
+The system generally knows where the data comes from and what the final report should contain.
+
+An LLM can be used to generate the natural-language summary, but there is usually no need for the system to dynamically decide its own workflow.
+
+**Classification: Workflow**
+
+**Reason:** The reporting process is scheduled, structured, and predictable.
+
+---
+
+### Medical Advice — Workflow
+
+Medical applications require particularly strong controls because incorrect information can have serious consequences.
+
+A controlled architecture can use:
+
+```text
+User Question
+      ↓
+Safety Screening
+      ↓
+Retrieve Trusted Information
+      ↓
+Generate Explanation
+      ↓
+Validate Output
+      ↓
+Escalate / Human Review When Appropriate
+```
+
+A workflow provides explicit control points for validation and escalation.
+
+**Classification: Workflow**
+
+**Reason:** The task requires controlled processing, trusted information, safety checks, and appropriate human oversight rather than unrestricted autonomous decision-making.
+
+---
+
+### Log Summariser — Workflow
+
+A log summarizer normally has a predictable sequence:
+
+```text
+Read Logs
+    ↓
+Filter Errors / Warnings
+    ↓
+Group Related Events
+    ↓
+Provide Relevant Context to LLM
+    ↓
+Generate Summary
+```
+
+The task is primarily transformation and summarization. The system does not normally need to decide dynamically what investigation to perform.
+
+**Classification: Workflow**
+
+**Reason:** Log ingestion, filtering, and summarization can follow a fixed and testable pipeline.
+
+However, the classification can change if the requirement changes from summarization to investigation.
+
+For example:
+
+> "Summarize today's errors."
+
+is naturally a workflow task.
+
+Whereas:
+
+> "Investigate the root cause of yesterday's production outage."
+
+may require an agent because it could involve dynamically inspecting logs, metrics, deployments, configuration, and other systems.
+
+---
+
+## Final Scorecard
+
+| Scenario            | Recommended Architecture | Main Reason                                   |
+| ------------------- | ------------------------ | --------------------------------------------- |
+| Payroll calculation | **Plain Code**           | Deterministic calculations                    |
+| Refund triage       | **Workflow**             | Fixed business process + AI classification    |
+| Code review         | **Agent**                | Dynamic repository investigation              |
+| Daily report        | **Workflow**             | Predictable reporting pipeline                |
+| Medical advice      | **Workflow**             | Controlled, high-risk process                 |
+| Log summariser      | **Workflow**             | Predictable data-processing and summarization |
+
+### Overall Principle
+
+**Plain Code → Workflow → Agent** represents increasing flexibility and autonomy.
+
+Use **plain code** when rules are deterministic, a **workflow** when the process is known, and an **agent** when the system genuinely needs to make dynamic decisions about how to achieve a goal.
+
+The objective is not to maximize autonomy. The objective is to choose the **simplest architecture that reliably solves the problem**.
